@@ -28,6 +28,7 @@ ActiveRecord::Schema.define(version: 2018_07_15_190545) do
 
   create_table "reports", force: :cascade do |t|
     t.bigint "survivor_id"
+    t.integer "survivor_id_report"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["survivor_id"], name: "index_reports_on_survivor_id"

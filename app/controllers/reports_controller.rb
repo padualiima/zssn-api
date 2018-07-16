@@ -7,9 +7,14 @@ class ReportsController < ApplicationController
 	# create new report, passing the ID from survivor reported
 	def create
 		@report = Report.new(report_params)
-		if @report.save
+		@survivors = Survivor.find(@report.survivor_id_report)
+		if @survivors.infected
+			render json: {message: "infected survivor can't report"}, status: 400
+		elsif @report.save
 			infection_report
 			render json: @report, status: :created
+		else
+			render json: @report.errors, status: :unprocessable_entity
 		end
 	end
 	# reports from infected
@@ -31,14 +36,15 @@ class ReportsController < ApplicationController
 	private
 
 	def report_params
-		params.require(:report).permit(:survivor_id)
+		params.require(:report).permit(:survivor_id, :survivor_id_report)
 	end
-
+	#
 	def infection_report
 		survivor = Survivor.find(@report.survivor_id)
 		total_reports = Report.where(survivor_id: @report.survivor_id).count
 		survivor.update(infected: total_reports >= 3)
 	end
+
 end
 
 
